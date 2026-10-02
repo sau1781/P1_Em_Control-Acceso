@@ -1,0 +1,57 @@
+[Unit]
+Description=Sistema de Control de Acceso Autonomo (GStreamer + OpenCV DNN)
+
+After=network-online.target
+Wants=network-online.target
+After=dev-video0.device
+BindsTo=dev-video0.device
+StartLimitIntervalSec=0
+
+[Service]
+Type=notify
+NotifyAccess=main
+WatchdogSec=30s
+
+# "python3 -m acceso.main" y no "python3 acceso/main.py": al usar -m,
+# Python agrega el directorio de trabajo a sys.path automaticamente, que es
+# lo que permite que main.py encuentre "from acceso import config, ..." sin
+# tener que instalar el paquete ni tocar PYTHONPATH a mano.
+ExecStart=/usr/bin/python3 -m acceso.main
+WorkingDirectory=/usr/share/control-acceso
+
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=20
+
+Environment="PYTHONUNBUFFERED=1"
+Environment="ACCESO_DATA=/var/lib/control-acceso"
+Environment="ACCESO_MODELS=/usr/share/control-acceso"
+# En la Raspberry Pi real: v4l2src + codificador de HARDWARE (v4l2h264enc).
+# Cambiar a "webcam" solo si se prueba con una camara generica sin ese chip.
+Environment="ACCESO_FUENTE=produccion"
+Environment="ACCESO_CAM=/dev/video0"
+# IP del puesto de vigilancia. Ajustar segun la red del dia de la demo
+# (ver la conversacion sobre IP fija por reserva DHCP).
+Environment="ACCESO_HOST=192.168.1.50"
+Environment="GST_DEBUG=2"
+
+StateDirectory=control-acceso
+StateDirectoryMode=0750
+
+User=acceso
+Group=acceso
+SupplementaryGroups=video gpio
+
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+RestrictSUIDSGID=yes
+ReadWritePaths=/var/lib/control-acceso
+DeviceAllow=/dev/video0 rw
+DeviceAllow=/dev/video11 rw
+DeviceAllow=/dev/gpiochip0 rw
+
+[Install]
+WantedBy=multi-user.target

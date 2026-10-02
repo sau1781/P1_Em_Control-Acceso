@@ -1,0 +1,8 @@
+*.pyc
+__pycache__/
+*.o
+*.so
+.vscode/
+tmp/
+downloads/
+sstate-cache/
