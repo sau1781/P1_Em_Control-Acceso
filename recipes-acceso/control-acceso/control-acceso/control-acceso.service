@@ -27,14 +27,11 @@ TimeoutStopSec=20
 Environment="PYTHONUNBUFFERED=1"
 Environment="ACCESO_DATA=/var/lib/control-acceso"
 Environment="ACCESO_MODELS=/usr/share/control-acceso"
-# En la Raspberry Pi real: v4l2src + codificador de HARDWARE (v4l2h264enc).
-# Cambiar a "webcam" solo si se prueba con una camara generica sin ese chip.
-Environment="ACCESO_FUENTE=produccion"
 Environment="ACCESO_CAM=/dev/video0"
-# IP del puesto de vigilancia. Ajustar segun la red del dia de la demo
-# (ver la conversacion sobre IP fija por reserva DHCP).
-Environment="ACCESO_HOST=192.168.1.50"
 Environment="GST_DEBUG=2"
+
+# Leer configuracion dinamica (IP del vigilante y codificador de hardware/software)
+EnvironmentFile=-/etc/default/control-acceso
 
 StateDirectory=control-acceso
 StateDirectoryMode=0750

@@ -27,6 +27,7 @@ SRC_URI = " \
     file://MobileNetSSD_deploy.prototxt \
     file://MobileNetSSD_deploy.caffemodel \
     https://media.githubusercontent.com/media/opencv/opencv_zoo/47534e27c9851bb1128ccc0102f1145e27f23f98/models/face_detection_yunet/face_detection_yunet_2023mar.onnx;downloadfilename=face_detection_yunet_2023mar.onnx \
+    file://control-acceso.env \
 "
 SRC_URI[sha256sum] = "8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4"
 
@@ -94,6 +95,8 @@ do_install() {
 
     # El directorio de datos escribibles (/var/lib/control-acceso) lo crea
     # systemd solo via StateDirectory= en el .service; no se toca aqui.
+    install -d ${D}${sysconfdir}/default
+    install -m 0644 ${UNPACKDIR}/control-acceso.env ${D}${sysconfdir}/default/control-acceso
 }
 
 FILES:${PN} += "${datadir}/control-acceso ${systemd_system_unitdir}"

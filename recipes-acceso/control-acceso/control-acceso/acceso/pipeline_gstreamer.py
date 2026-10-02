@@ -53,9 +53,11 @@ def construir_descripcion() -> str:
                                 no existe en un PC ni en QEMU.
     """
     if config.FUENTE == "produccion":
-        fuente = (f"v4l2src device={config.DISPOSITIVO_CAM} io-mode=4 ! "
+        fuente = (f"v4l2src device={config.DISPOSITIVO_CAM} ! "
+                  f"videoconvert ! videoscale ! "
                   f"video/x-raw,width={config.ANCHO_CAPTURA},"
-                  f"height={config.ALTO_CAPTURA},framerate={config.FPS_CAPTURA}/1")
+                  f"height={config.ALTO_CAPTURA} ! videorate ! "
+                  f"video/x-raw,framerate={config.FPS_CAPTURA}/1")
         # NV12 es obligatorio: el bloque V4L2 M2M del BCM2711 no acepta otro
         # formato de entrada. level=(string)4 evita que el elemento negocie
         # mal el nivel H.264 y aborte el enlace.
