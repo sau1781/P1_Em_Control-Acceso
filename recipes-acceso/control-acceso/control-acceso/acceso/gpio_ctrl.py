@@ -127,7 +127,7 @@ def hilo_override(parada: threading.Event):
                 if ev.event_type == ev.Type.FALLING_EDGE:
                     bitacora.registrar_evento(
                         "OVERRIDE - Salida manual (boton NC abierto)")
-                    estado_puerta.marcar_override()
+                    estado_puerta.abrir_puerta()
                 else:
                     bitacora.registrar_evento(
                         "OVERRIDE - Lazo NC restablecido")
