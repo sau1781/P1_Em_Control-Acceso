@@ -1,54 +1,31 @@
 [Unit]
 Description=Sistema de Control de Acceso Autonomo (GStreamer + OpenCV DNN)
-
-After=network-online.target
-Wants=network-online.target
-After=dev-video0.device
-BindsTo=dev-video0.device
-StartLimitIntervalSec=0
+After=network.target
 
 [Service]
-Type=notify
-NotifyAccess=main
-WatchdogSec=30s
-
-# "python3 -m acceso.main" y no "python3 acceso/main.py": al usar -m,
-# Python agrega el directorio de trabajo a sys.path automaticamente, que es
-# lo que permite que main.py encuentre "from acceso import config, ..." sin
-# tener que instalar el paquete ni tocar PYTHONPATH a mano.
-ExecStart=/usr/bin/python3 -m acceso.main
 WorkingDirectory=/usr/share/control-acceso
 
-Restart=on-failure
+# Leer las variables dinamicas
+EnvironmentFile=-/etc/default/control-acceso
+# Inyectar variables globales necesarias para Python
+Environment="PYTHONPATH=/usr/share/control-acceso"
+Environment="PYTHONUNBUFFERED=1"
+
+# Esperar 5 segundos al arrancar para que el USB de la camara despierte
+ExecStartPre=/bin/sleep 5
+
+# El comando exacto
+ExecStart=/usr/bin/python3 -m acceso.main
+
+# Resiliencia total
+Restart=always
 RestartSec=5
 KillSignal=SIGTERM
 TimeoutStopSec=20
 
-Environment="PYTHONUNBUFFERED=1"
-Environment="ACCESO_DATA=/var/lib/control-acceso"
-Environment="ACCESO_MODELS=/usr/share/control-acceso"
-Environment="ACCESO_CAM=/dev/video0"
-Environment="GST_DEBUG=2"
-
-# Leer configuracion dinamica (IP del vigilante y codificador de hardware/software)
-EnvironmentFile=-/etc/default/control-acceso
-
-StateDirectory=control-acceso
-StateDirectoryMode=0750
-
-User=acceso
-Group=acceso
-SupplementaryGroups=video gpio
-
-ProtectSystem=strict
-ProtectHome=yes
-PrivateTmp=yes
-NoNewPrivileges=yes
-RestrictSUIDSGID=yes
-ReadWritePaths=/var/lib/control-acceso
-DeviceAllow=/dev/video0 rw
-DeviceAllow=/dev/video11 rw
-DeviceAllow=/dev/gpiochip0 rw
+# Seguridad
+User=root
+Group=root
 
 [Install]
 WantedBy=multi-user.target
