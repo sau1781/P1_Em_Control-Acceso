@@ -5,11 +5,15 @@ After=network.target
 [Service]
 WorkingDirectory=/usr/share/control-acceso
 
-# Leer las variables dinamicas
+# Leer las variables dinamicas (IP del vigilante, hardware mode)
 EnvironmentFile=-/etc/default/control-acceso
-# Inyectar variables globales necesarias para Python
+
+# Inyectar variables globales y RUTAS SEGURAS
 Environment="PYTHONPATH=/usr/share/control-acceso"
 Environment="PYTHONUNBUFFERED=1"
+Environment="ACCESO_DATA=/home/root/control-acceso"
+Environment="ACCESO_MODELS=/usr/share/control-acceso"
+Environment="GST_DEBUG=2"
 
 # Esperar 5 segundos al arrancar para que el USB de la camara despierte
 ExecStartPre=/bin/sleep 5
